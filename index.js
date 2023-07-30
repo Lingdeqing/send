@@ -102,6 +102,9 @@ function SendStream (req, path, options) {
   this.path = path
   this.req = req
 
+  // 内存模式
+  this.fs = opts.fs || fs
+
   this._acceptRanges = opts.acceptRanges !== undefined
     ? Boolean(opts.acceptRanges)
     : true
@@ -714,7 +717,7 @@ SendStream.prototype.sendFile = function sendFile (path) {
   var self = this
 
   debug('stat "%s"', path)
-  fs.stat(path, function onstat (err, stat) {
+  this.fs.stat(path, function onstat (err, stat) {
     if (err && err.code === 'ENOENT' && !extname(path) && path[path.length - 1] !== sep) {
       // not found, check extensions
       return next(err)
@@ -735,7 +738,7 @@ SendStream.prototype.sendFile = function sendFile (path) {
     var p = path + '.' + self._extensions[i++]
 
     debug('stat "%s"', p)
-    fs.stat(p, function (err, stat) {
+    this.fs.stat(p, function (err, stat) {
       if (err) return next(err)
       if (stat.isDirectory()) return next()
       self.emit('file', p, stat)
@@ -763,7 +766,7 @@ SendStream.prototype.sendIndex = function sendIndex (path) {
     var p = join(path, self._index[i])
 
     debug('stat "%s"', p)
-    fs.stat(p, function (err, stat) {
+    this.fs.stat(p, function (err, stat) {
       if (err) return next(err)
       if (stat.isDirectory()) return next()
       self.emit('file', p, stat)
@@ -787,7 +790,7 @@ SendStream.prototype.stream = function stream (path, options) {
   var res = this.res
 
   // pipe
-  var stream = fs.createReadStream(path, options)
+  var stream = this.fs.createReadStream(path, options)
   this.emit('stream', stream)
   stream.pipe(res)
 
