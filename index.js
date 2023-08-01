@@ -738,7 +738,7 @@ SendStream.prototype.sendFile = function sendFile (path) {
     var p = path + '.' + self._extensions[i++]
 
     debug('stat "%s"', p)
-    this.fs.stat(p, function (err, stat) {
+    self.fs.stat(p, function (err, stat) {
       if (err) return next(err)
       if (stat.isDirectory()) return next()
       self.emit('file', p, stat)
@@ -766,7 +766,7 @@ SendStream.prototype.sendIndex = function sendIndex (path) {
     var p = join(path, self._index[i])
 
     debug('stat "%s"', p)
-    this.fs.stat(p, function (err, stat) {
+    self.fs.stat(p, function (err, stat) {
       if (err) return next(err)
       if (stat.isDirectory()) return next()
       self.emit('file', p, stat)
